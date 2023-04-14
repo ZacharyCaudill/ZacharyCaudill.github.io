@@ -1,1 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Select a Major</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+    <script>
+      function displayData(major) {
+        // Read and parse the JSON data
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+              var data = JSON.parse(xhr.responseText);
 
+              // Filter the data by major
+              var filteredData = data.filter(function(student) {
+                return student.major === major;
+              });
+
+              // Get the Handlebars template and compile it
+              var templateSource = document.getElementById('student-template').innerHTML;
+              var template = Handlebars.compile(templateSource);
+
+              // Populate the template with the filtered data
+              var html = template({students: filteredData});
+
+              // Insert the HTML into the page
+              document.getElementById('student-table').innerHTML = html;
+            } else {
+              console.log('Error: ' + xhr.status);
+            }
+          }
+        };
+        xhr.open('GET', 'cit5students.json', true);
+        xhr.send();
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Select a Major</h1>
+    <button onclick="displayData('CIT')">CIT Majors</button>
+    <button onclick="displayData('BUS')">Business Majors</button>
+    <table id="student-table"></table>
+    <script id="student-template" type="text/x-handlebars-template">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Major</th>
+          <th>Midterm Score</th>
+          <th>Final Exam Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each students}}
+        <tr>
+          <td>{{name}}</td>
+          <td>{{major}}</td>
+          <td>{{midterm}}</td>
+          <td>{{final}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </script>
+  </body>
+</html>
